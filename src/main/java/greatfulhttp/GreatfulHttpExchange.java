@@ -32,6 +32,8 @@ public class GreatfulHttpExchange extends HttpExchange {
 	 * 
 	 ******************************************/
 
+	protected String requestBody;
+	
 	/**
 	 * 以 UTF8 读取请求内容
 	 * 
@@ -50,11 +52,14 @@ public class GreatfulHttpExchange extends HttpExchange {
 	 * @throws IOException
 	 */
 	public String readRequestBody(String charset) throws IOException {
-		Scanner scan = new Scanner(getRequestBody(), charset);
-		scan.useDelimiter("\\A");
-		String str = scan.hasNext() ? scan.next() : "";
-		scan.close();
-		return GreatfulHttpUtil.decode(str);
+		if(requestBody == null) {
+			Scanner scan = new Scanner(getRequestBody(), charset);
+			scan.useDelimiter("\\A");
+			String str = scan.hasNext() ? scan.next() : "";
+			scan.close();
+			requestBody = GreatfulHttpUtil.decode(str);
+		}
+		return requestBody;
 	}
 
 	/**
