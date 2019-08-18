@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
+}
+
+repositories {
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+dependencies {
+    implementation 'com.google.guava:guava:27.0.1-jre'
+
+    testImplementation 'junit:junit:4.12'
+}
+
+shadowJar {
+	classifier = null
+	manifest {
+		attributes(
+			
+		)
+	}
+	
+	from("./") {
+		include 'build.gradle'
+	}
+}
