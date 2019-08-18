@@ -23,7 +23,7 @@ public class ParamMap extends HashMap<String, String> {
 			for(String part : parts) {
 				String[] kvpair = part.split("="); // "a=1" => ["a", "1"]
 				if(kvpair[0] != null) {
-					put(kvpair[0], kvpair[1]);     // to put them into the map.
+					put(kvpair[0], kvpair.length > 1 ? kvpair[1] : ""); // to put them into the map.
 				}
 			}
 		}
