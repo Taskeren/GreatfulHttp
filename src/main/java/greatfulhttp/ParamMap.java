@@ -18,7 +18,7 @@ public class ParamMap extends HashMap<String, String> {
 	 */
 	public ParamMap(String str) {
 		super();
-		if(!str.isEmpty()) {
+		if(str != null && !str.isEmpty()) {
 			String[] parts = str.split("&");       // "a=1&b=2" => ["a=1", "b=2"]
 			for(String part : parts) {
 				String[] kvpair = part.split("="); // "a=1" => ["a", "1"]
