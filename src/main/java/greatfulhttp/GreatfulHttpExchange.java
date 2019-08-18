@@ -106,6 +106,22 @@ public class GreatfulHttpExchange extends HttpExchange {
 			throw new IllegalStateException("request should be POST method");
 		}
 	}
+	
+	/**
+	 * 是否是 Post 请求
+	 * @return 是否是 Post 请求
+	 */
+	public boolean isPostRequest() {
+		return getRequestMethod().equalsIgnoreCase("post");
+	}
+	
+	/**
+	 * 是否是 Get 请求
+	 * @return 是否是 Get 请求
+	 */
+	public boolean isGetRequest() {
+		return getRequestMethod().equalsIgnoreCase("get");
+	}
 
 	/**
 	 * 获取 GET 数据
