@@ -33,7 +33,7 @@ public class GreatfulHttpExchange extends HttpExchange {
 	 ******************************************/
 
 	protected String requestBody;
-	
+
 	/**
 	 * 以 UTF8 读取请求内容
 	 * 
@@ -52,7 +52,7 @@ public class GreatfulHttpExchange extends HttpExchange {
 	 * @throws IOException
 	 */
 	public String readRequestBody(String charset) throws IOException {
-		if(requestBody == null) {
+		if (requestBody == null) {
 			Scanner scan = new Scanner(getRequestBody(), charset);
 			scan.useDelimiter("\\A");
 			String str = scan.hasNext() ? scan.next() : "";
@@ -111,17 +111,19 @@ public class GreatfulHttpExchange extends HttpExchange {
 			throw new IllegalStateException("request should be POST method");
 		}
 	}
-	
+
 	/**
 	 * 是否是 Post 请求
+	 * 
 	 * @return 是否是 Post 请求
 	 */
 	public boolean isPostRequest() {
 		return getRequestMethod().equalsIgnoreCase("post");
 	}
-	
+
 	/**
 	 * 是否是 Get 请求
+	 * 
 	 * @return 是否是 Get 请求
 	 */
 	public boolean isGetRequest() {
@@ -139,6 +141,15 @@ public class GreatfulHttpExchange extends HttpExchange {
 		} else {
 			throw new IllegalStateException("request should be GET method");
 		}
+	}
+
+	/**
+	 * 获取数据，自动判断 GET 或 POST
+	 * 
+	 * @return 数据
+	 */
+	public ParamMap getParameters() throws IOException {
+		return isGetRequest() ? getGetParameters() : getPostParameters();
 	}
 
 	/*
