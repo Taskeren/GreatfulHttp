@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import com.sun.net.httpserver.Headers;
@@ -35,23 +36,19 @@ public class GreatfulHttpExchange extends HttpExchange {
 	protected String requestBody;
 
 	/**
-	 * 以 UTF8 读取请求内容
-	 * 
-	 * @return 请求内容
-	 * @throws IOException
+	 * 获取内容
+	 * @return 内容
 	 */
-	public String readRequestBody() throws IOException {
-		return readRequestBody("UTF-8");
+	public String body() throws IOException {
+		return body("UTF-8");
 	}
 
 	/**
-	 * 读取请求内容
-	 * 
+	 * 获取内容
 	 * @param charset 编码
-	 * @return 请求内容
-	 * @throws IOException
+	 * @return 内容
 	 */
-	public String readRequestBody(String charset) throws IOException {
+	public String body(String charset) throws IOException {
 		if (requestBody == null) {
 			Scanner scan = new Scanner(getRequestBody(), charset);
 			scan.useDelimiter("\\A");
@@ -63,93 +60,54 @@ public class GreatfulHttpExchange extends HttpExchange {
 	}
 
 	/**
-	 * 返回请求并关闭连接
-	 * 
-	 * @param code 状态码
-	 * @throws IOException
+	 * 返回状态并关闭请求（用于部分不返回内容的请求和状态）
+	 * @param status 状态
+	 * @see #end(int, Object)
 	 */
-	public void respondAndClose(int code) throws IOException {
-		respondAndClose(code, "");
+	public void end(int status) throws IOException {
+		end(status, "");
 	}
 
 	/**
-	 * 返回请求并关闭连接
-	 * 
-	 * @param code    状态码
-	 * @param message 消息
-	 * @throws IOException
+	 * 返回内容并关闭请求
+	 * @param status  状态（e.g. 200，404，503）
+	 * @param message 返回内容（部分状态限制不返回任何内容）
 	 */
-	public void respondAndClose(int code, Object message) throws IOException {
-		byte[] bytes = message.toString().getBytes();
-		exchange.sendResponseHeaders(code, bytes.length == 0 ? -1 : bytes.length);
-		OutputStream out = exchange.getResponseBody();
-		out.write(bytes);
-		out.close();
+	public void end(int status, Object message) throws IOException {
+		final byte[] b = String.valueOf(message).getBytes();
+		exchange.sendResponseHeaders(status, b.length);
+		OutputStream o = exchange.getResponseBody();
+		o.write(b);
+		o.close();
 	}
 
-	/**
-	 * 获取 POST 数据
-	 * 
-	 * @return POST 数据
-	 * @throws IOException
-	 */
-	public ParamMap getPostParameters() throws IOException {
-		return getPostParameters("UTF-8");
-	}
-
-	/**
-	 * 获取 POST 数据
-	 * 
-	 * @param enc 编码
-	 * @return POST 数据
-	 * @throws IOException
-	 */
-	public ParamMap getPostParameters(String enc) throws IOException {
-		if (exchange.getRequestMethod().equalsIgnoreCase("post")) {
-			return new ParamMap(readRequestBody(enc));
-		} else {
-			throw new IllegalStateException("request should be POST method");
-		}
-	}
-
-	/**
-	 * 是否是 Post 请求
-	 * 
-	 * @return 是否是 Post 请求
-	 */
-	public boolean isPostRequest() {
-		return getRequestMethod().equalsIgnoreCase("post");
-	}
-
-	/**
-	 * 是否是 Get 请求
-	 * 
-	 * @return 是否是 Get 请求
-	 */
 	public boolean isGetRequest() {
 		return getRequestMethod().equalsIgnoreCase("get");
 	}
 
-	/**
-	 * 获取 GET 数据
-	 * 
-	 * @return GET 数据
-	 */
-	public ParamMap getGetParameters() {
-		if (exchange.getRequestMethod().equalsIgnoreCase("get")) {
-			return new ParamMap(getRequestURI().getQuery());
-		} else {
-			throw new IllegalStateException("request should be GET method");
-		}
+	public boolean isPutRequest() {
+		return getRequestMethod().equalsIgnoreCase("put");
+	}
+
+	public boolean isPostRequest() {
+		return getRequestMethod().equalsIgnoreCase("post");
+	}
+
+	public boolean isHeadRequest() {
+		return getRequestMethod().equalsIgnoreCase("head");
+	}
+
+	public boolean isDeleteRequest() {
+		return getRequestMethod().equalsIgnoreCase("delete");
 	}
 
 	/**
-	 * 获取数据，自动判断 GET 或 POST
-	 * 
-	 * @return 数据
+	 * 获取请求URI中的Param键值对
+	 * <p>
+	 * a=1&b=2 => {"a": 1, "b": 2}
 	 */
-	public ParamMap getParameters() throws IOException {
-		return isGetRequest() ? getGetParameters() : getPostParameters();
+	public HashMap<String, String> getParameters() {
+		return GreatfulHttpUtil.toMap(getRequestURI().getQuery());
 	}
 
 	/*

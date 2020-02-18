@@ -7,7 +7,7 @@ import com.sun.net.httpserver.*;
 public abstract class GreatfulHttp implements HttpHandler {
 
 	@Override
-	public void handle(HttpExchange exchange) throws IOException {
+	public final void handle(HttpExchange exchange) throws IOException {
 		onHandle(new GreatfulHttpExchange(exchange));
 	}
 	
